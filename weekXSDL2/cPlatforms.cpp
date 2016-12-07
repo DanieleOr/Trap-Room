@@ -24,12 +24,6 @@ Update the sprite position
 void cPlatforms::update(double deltaTime)
 {
 
-	//this->setSpriteRotAngle(this->getSpriteRotAngle() +(50.0f * deltaTime)); 
-	//if (this->getSpriteRotAngle() > 360)
-	//{
-	//	this->setSpriteRotAngle(this->getSpriteRotAngle() -360);
-	//}
-
 	SDL_Rect currentSpritePos = this->getSpritePos();
 	currentSpritePos.x += this->getSpriteTranslation().x * deltaTime * 20;
 	currentSpritePos.y += this->getSpriteTranslation().y * deltaTime * 20;

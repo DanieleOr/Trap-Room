@@ -117,17 +117,18 @@ void cGame::initialise(SDL_Window* theSDLWND, SDL_Renderer* theRenderer)
 	}
 
 	theSoundMgr->getSnd("theme")->play(-1);
-	
+	// Load background
 	spriteBkgd.setSpritePos({ 0, 0 });
 	spriteBkgd.setTexture(theTextureMgr->getTexture("theBackground"));
 	spriteBkgd.setSpriteDimensions(theTextureMgr->getTexture("theBackground")->getTWidth(), theTextureMgr->getTexture("Instructions")->getTHeight());
 
+	// Load character
 	theMan.setSpritePos({ 0, 644 });
 	theMan.setTexture(theTextureMgr->getTexture("bob"));
 	theMan.setSpriteDimensions(theTextureMgr->getTexture("bob")->getTWidth(), theTextureMgr->getTexture("bob")->getTHeight());
 	theMan.setManVelocity({ 0, 0 });
 
-	// Create vector array of textures
+	// Create vector array of textures for red blocks
 	SDL_Point platformPos[12] = { { 120, 0 }, { 270, 30 }, { 420, 60 }, { 570, 90 }, { 720, 120 }, { 870, 150 }, { 120, 443 }, { 270, 473 }, { 420, 493 }, { 570, 523 }, { 720, 553 }, { 870, 583 } };
 
 	for (int astro = 0; astro < 12; astro++)
@@ -141,10 +142,6 @@ void cGame::initialise(SDL_Window* theSDLWND, SDL_Renderer* theRenderer)
 		thePlatforms[astro]->setPlatformVelocity({ 0.0f, 3.0f });
 		thePlatforms[astro]->setActive(true);
 	}
-
-	//sScore = "";
-	//score = 0;
-
 }
 
 void cGame::run(SDL_Window* theSDLWND, SDL_Renderer* theRenderer)
@@ -193,6 +190,7 @@ void cGame::render(SDL_Window* theSDLWND, SDL_Renderer* theRenderer)
 	break;
 	case PLAYING:
 	{
+		// Render textures
 		spriteBkgd.render(theRenderer, NULL, NULL, spriteBkgd.getSpriteScale());
 		tempTextTexture = theTextureMgr->getTexture("TitleTxt");
 		pos = { 10, 10, tempTextTexture->getTextureRect().w, tempTextTexture->getTextureRect().h };
@@ -209,6 +207,7 @@ void cGame::render(SDL_Window* theSDLWND, SDL_Renderer* theRenderer)
 		theButtonMgr->getBtn("save_btn")->render(theRenderer, &theButtonMgr->getBtn("save_btn")->getSpriteDimensions(), &theButtonMgr->getBtn("save_btn")->getSpritePos(), theButtonMgr->getBtn("save_btn")->getSpriteScale());
 		if (saveBtnClicked == true)
 		{
+			// Give feedback if game is saved
 			tempTextTexture = theTextureMgr->getTexture("SavedGame");
 			pos = { 150, 650, tempTextTexture->getTextureRect().w, tempTextTexture->getTextureRect().h };
 			tempTextTexture->renderTexture(theRenderer, tempTextTexture->getTexture(), &tempTextTexture->getTextureRect(), &pos, scale);
@@ -217,22 +216,18 @@ void cGame::render(SDL_Window* theSDLWND, SDL_Renderer* theRenderer)
 				saveBtnClicked = false;
 			}
 		}
+		// Draw platforms
 		for (int draw = 0; draw < thePlatforms.size(); draw++)
 		{
 			thePlatforms[draw]->render(theRenderer, &thePlatforms[draw]->getSpriteDimensions(), &thePlatforms[draw]->getSpritePos(), thePlatforms[draw]->getSpriteRotAngle(), &thePlatforms[draw]->getSpriteCentre(), thePlatforms[draw]->getSpriteScale());
 		}
+		//Draw character
 		theMan.render(theRenderer, &theMan.getSpriteDimensions(), &theMan.getSpritePos(), theMan.getSpriteRotAngle(), &theMan.getSpriteCentre(), theMan.getSpriteScale());
-		//theTextureMgr->addTexture("Score", theFontMgr->getFont("BeNe")->createTextTexture(theRenderer, sScore.c_str(), SOLID, { 0, 255, 0, 255 }, { 0, 0, 0, 0 }));
-		//tempTextTexture = theTextureMgr->getTexture("Score");
-		//pos = { 600, 10, tempTextTexture->getTextureRect().w, tempTextTexture->getTextureRect().h };
-		//tempTextTexture->renderTexture(theRenderer, tempTextTexture->getTexture(), &tempTextTexture->getTextureRect(), &pos, scale);
-		//score++;
-		//sScore = gameTextList[10] + to_string(score);
-		//theTextureMgr->deleteTexture("Score");
 	}
 	break;
 	case END:
 	{
+		// Render textures
 		spriteBkgd.render(theRenderer, NULL, NULL, spriteBkgd.getSpriteScale());
 		tempTextTexture = theTextureMgr->getTexture("TitleTxt");
 		pos = { 10, 10, tempTextTexture->getTextureRect().w, tempTextTexture->getTextureRect().h };
@@ -247,7 +242,7 @@ void cGame::render(SDL_Window* theSDLWND, SDL_Renderer* theRenderer)
 		theButtonMgr->getBtn("menu_btn")->render(theRenderer, &theButtonMgr->getBtn("menu_btn")->getSpriteDimensions(), &theButtonMgr->getBtn("menu_btn")->getSpritePos(), theButtonMgr->getBtn("menu_btn")->getSpriteScale());
 		theButtonMgr->getBtn("exit_btn")->setSpritePos({ 500, 575 });
 		theButtonMgr->getBtn("exit_btn")->render(theRenderer, &theButtonMgr->getBtn("exit_btn")->getSpriteDimensions(), &theButtonMgr->getBtn("exit_btn")->getSpritePos(), theButtonMgr->getBtn("exit_btn")->getSpriteScale());
-//	 	write the win and lose conditions here
+		// Win and lose messages
 		if (playerWon)
 		{
 			// Winning text
@@ -299,7 +294,7 @@ void cGame::update()
 
 void cGame::update(double deltaTime)
 {
-	// CHeck Button clicked and change state
+	// Check Button clicked and change state
 	switch (theGameState)
 	{
 		case MENU:
@@ -338,10 +333,12 @@ void cGame::update(double deltaTime)
 				theAreaClicked = { 0, 0 };
 			}
 			messageDelay += deltaTime;
+			// Update platform position
 			for (int updatePlts = 0; updatePlts < thePlatforms.size(); updatePlts++)
 			{
 				thePlatforms[updatePlts]->update(deltaTime);
 			}
+			// Update the man position
 			theMan.update(deltaTime);
 
 			for (vector<cPlatforms*>::iterator platformIterartor = thePlatforms.begin(); platformIterartor != thePlatforms.end(); ++platformIterartor)
@@ -371,29 +368,13 @@ void cGame::update(double deltaTime)
 		default:
 			break;
 	}
-
-	//// Update the visibility and position of each platform
-	//vector<cPlatform*>::iterator platformIterator = thePlatforms.begin();
-	//while (platformIterator != thePlatforms.end())
-	//{
-	//	if ((*platformIterator)->isActive() == false)
-	//	{
-	//		platformIterator = thePlatforms.erase(platformIterator);
-	//	}
-	//	else
-	//	{
-	//		(*platformIterator)->update(deltaTime);
-	//		++platformIterator;
-	//	}
-	//}
-
-
 }
 
 bool cGame::getInput(bool theLoop)
 {
 	SDL_Event event;
 
+	// Directional arrows enable movement and mous clicking allow selection
 	while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
@@ -450,30 +431,20 @@ bool cGame::getInput(bool theLoop)
 					break;
 				case SDLK_DOWN:
 				{
-					//if (theMan.getSpritePos().y < (WINDOW_HEIGHT - theMan.getSpriteDimensions().h))
-					//{
-					//	theMan.setSpriteTranslation({ 0, 40 });
-					//}
 				}
 				break;
 
 				case SDLK_UP:
 				{
-					//if (theMan.getSpritePos().y > 0)
-					//{
-					//	theMan.setSpriteTranslation({ 0, -35 });
-					//}
 				}
 				break;
 				case SDLK_RIGHT: 
 				{
-		//			if (theMan.getSpritePos().x < (WINDOW_WIDTH - theMan.getSpriteDimensions().w))
-		//			{
-						theMan.setSpriteTranslation({ 40, 0 });
-						theSoundMgr->getSnd("step")->play(0);
-		//			}
+					theMan.setSpriteTranslation({ 40, 0 });
+					theSoundMgr->getSnd("step")->play(0);
 						if (theMan.getSpritePos().x > (WINDOW_WIDTH - theMan.getSpriteDimensions().w))
 						{
+							// The player win the game
 							theGameState = END;
 							playerWon = true;
 						}
