@@ -374,7 +374,7 @@ bool cGame::getInput(bool theLoop)
 {
 	SDL_Event event;
 
-	// Directional arrows enable movement and mous clicking allow selection
+	// Directional arrows enable movement and mouse clicking allow selection
 	while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
